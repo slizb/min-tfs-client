@@ -24,10 +24,12 @@ class TensorServingClient:
         self, host: str, port: int, credentials: Optional[grpc.ssl_channel_credentials] = None,
     ) -> None:
         self._host_address = f"{host}:{port}"
+        max_message_length = 512 * 1024 * 1024
+        options = [('grpc.max_receive_message_length', max_message_length)]
         if credentials:
-            self._channel = grpc.secure_channel(self._host_address, credentials)
+            self._channel = grpc.secure_channel(self._host_address, credentials, options=options)
         else:
-            self._channel = grpc.insecure_channel(self._host_address)
+            self._channel = grpc.insecure_channel(self._host_address, options=options)
 
     def _make_inference_request(
         self,
